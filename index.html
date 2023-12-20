@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasa Chatbot</title>
+    <style>
+        #chat-container {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        
+        #user-input {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            appendMessage('User', userInput);
+            
+            // Send user input to Rasa API
+            // You'll need to replace 'YOUR_RASA_API_ENDPOINT' with the actual endpoint of your Rasa server
+            const rasaEndpoint = 'http://localhost:5005/webhooks/rest/webhook';
+            console.log(rasaEndpoint)
+            fetch(rasaEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userInput }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botResponse = data[0].text;
+                appendMessage('Bot', botResponse);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function appendMessage(sender, message) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+        }
+    </script>
+</body>
+</html>
+
